@@ -30,25 +30,27 @@ composer require mainmoney/mm-aggr-php-sdk:dev-main
 use MainMoney\Aggregator\Client;
 
 $client = new Client(
-    baseUri: 'https://your-aggregator.example/api/v1/',
     clientId: getenv('MM_CLIENT_ID'),
     secret: getenv('MM_API_SECRET'),
+    test: true, // https://testaggregator.mainmoney.net — omit for production
 );
 
 $deposit = $client->deposits->create(
     [
-        'provider_code' => 'MPESA_KE',
+        'provider_code' => 'VODACOM_MPESA_COD',
         'reference' => 'ORDER-123',
         'amount' => '100.00',
-        'currency' => 'KES',
-        'customer_phone' => '+254700000000',
+        'currency' => 'USD',
+        'customer_phone' => '243820000000',
     ],
     idempotencyKey: 'ORDER-123',
 );
 ```
 
-Configure credentials from your environment. See merchant API docs at
-`/api/v1/docs/merchants/` on your aggregator host.
+Defaults: production `https://aggregator.mainmoney.net/api/v1/`, test
+`https://testaggregator.mainmoney.net/api/v1/`. Pass `baseUri` only to override.
+Configure credentials from your environment. Merchant API docs:
+`/api/v1/docs/merchants/` on the aggregator host.
 
 Exchange `client_id` and `secret` for a Bearer access token is handled by the
 SDK. There is no `X-API-KEY` header. Reuse the same `reference` and optional
