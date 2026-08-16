@@ -57,11 +57,11 @@ final class ClientTest extends TestCase
         );
 
         $result = $client->deposits->create([
-            'provider_code' => 'MPESA_KE',
+            'provider_code' => 'VODACOM_MPESA_COD',
             'reference' => 'ORDER-1',
             'amount' => '100.00',
-            'currency' => 'KES',
-            'customer_phone' => '+254700000000',
+            'currency' => 'USD',
+            'customer_phone' => '243820000000',
         ]);
 
         self::assertSame('PENDING', $result['status']);
@@ -80,7 +80,9 @@ final class ClientTest extends TestCase
         self::assertArrayNotHasKey('Idempotency-Key', $deposit['options']['headers']);
         self::assertSame('ORDER-1', $deposit['options']['json']['reference']);
         self::assertSame('100.00', $deposit['options']['json']['amount']);
-        self::assertSame('KES', $deposit['options']['json']['currency']);
+        self::assertSame('USD', $deposit['options']['json']['currency']);
+        self::assertSame('VODACOM_MPESA_COD', $deposit['options']['json']['provider_code']);
+        self::assertSame('243820000000', $deposit['options']['json']['customer_phone']);
     }
 
     public function testTokenIsCachedAcrossCalls(): void
@@ -226,5 +228,61 @@ final class ClientTest extends TestCase
             self::assertSame(400, $exception->getStatusCode());
             self::assertSame(['reference' => ['already exists']], $exception->getErrors());
         }
+    }
+
+    public function testDefaultBaseUriIsProduction(): void
+    {
+        $client = new Client(clientId: 'client-id', secret: 'secret', httpClient: new MockHttpClient());
+        self::assertSame(Client::PRODUCTION_BASE_URI, $client->getBaseUri());
+    }
+
+    public function testTestFlagUsesTestAggregator(): void
+    {
+        $client = new Client(
+            clientId: 'client-id',
+            secret: 'secret',
+            test: true,
+            httpClient: new MockHttpClient(),
+        );
+        self::assertSame(Client::TEST_BASE_URI, $client->getBaseUri());
+    }
+
+    public function testCustomHostWithoutApiPrefixIsNormalized(): void
+    {
+        $client = new Client(
+            clientId: 'client-id',
+            secret: 'secret',
+            baseUri: 'https://aggregator.mainmoney.net',
+            httpClient: new MockHttpClient(),
+        );
+        self::assertSame(Client::PRODUCTION_BASE_URI, $client->getBaseUri());
+    }
+
+    public function testCheckoutPreferencesGet(): void
+    {
+        $mock = new MockHttpClient();
+        $client = $this->clientWithMock(
+            [
+                $this->tokenResponse(),
+                new HttpResponse(200, json_encode([
+                    'success' => true,
+                    'response_data' => [
+                        'primary_color' => '#ff3366',
+                        'secondary_color' => '#5f5e5e',
+                        'accent_color' => '#b90040',
+                        'background_color' => '#f8f9fb',
+                        'locale' => 'en',
+                        'logo' => null,
+                    ],
+                    'message' => 'ok',
+                ], JSON_THROW_ON_ERROR)),
+            ],
+            $mock,
+        );
+
+        $prefs = $client->checkoutPreferences->get();
+        self::assertSame('#ff3366', $prefs['primary_color']);
+        self::assertSame('en', $prefs['locale']);
+        self::assertStringContainsString('/manage/general/checkout-preferences/', $mock->history[1]['uri']);
     }
 }
