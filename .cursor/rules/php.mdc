@@ -1,0 +1,11 @@
+---
+description: PHP SDK coding standards
+globs: "**/*.php"
+alwaysApply: false
+---
+
+# PHP
+
+- `declare(strict_types=1);` on every PHP file.
+- PSR-12 / PHP CS Fixer. PHPStan level as configured.
+- Namespace `MainMoney\\Aggregator\\`.
