@@ -20,7 +20,18 @@ git clone git@github.com:MainMoney-Inc/mm_aggr_php_sdk.git
 composer install
 ./vendor/bin/phpunit
 ./vendor/bin/phpstan analyse
+./vendor/bin/php-cs-fixer fix --dry-run --diff
 ```
+
+## Packagist
+
+The Composer name is `mainmoney/mm-aggr-php-sdk`. First publish is a one-time
+submit on [Packagist](https://packagist.org/packages/submit) pointing at
+`https://github.com/MainMoney-Inc/mm_aggr_php_sdk`. After that, enable the
+GitHub Service Hook (or Packagist GitHub App) so tags update the package.
+
+Release by pushing an annotated tag (`v0.1.0`, then semver). Do not commit
+Packagist API tokens.
 
 ## Branches and commits
 
