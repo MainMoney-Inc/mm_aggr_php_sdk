@@ -18,6 +18,7 @@ use MainMoney\Aggregator\Resources\Payouts;
 use MainMoney\Aggregator\Resources\Providers;
 use MainMoney\Aggregator\Resources\Refunds;
 use MainMoney\Aggregator\Resources\Remittances;
+use MainMoney\Aggregator\Resources\Reports;
 use MainMoney\Aggregator\Resources\Status;
 use MainMoney\Aggregator\Resources\Transactions;
 use MainMoney\Aggregator\Resources\Wallets;
@@ -36,6 +37,7 @@ final class Client
     public readonly Customers $customers;
     public readonly Wallets $wallets;
     public readonly Transactions $transactions;
+    public readonly Reports $reports;
     public readonly Countries $countries;
     public readonly Providers $providers;
     public readonly Fees $fees;
@@ -69,6 +71,7 @@ final class Client
         $this->customers = new Customers($transport);
         $this->wallets = new Wallets($transport);
         $this->transactions = new Transactions($transport);
+        $this->reports = new Reports($transport);
         $this->countries = new Countries($transport);
         $this->providers = new Providers($transport);
         $this->fees = new Fees($transport);

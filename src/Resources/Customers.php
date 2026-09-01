@@ -29,11 +29,12 @@ final class Customers extends Resource
     /**
      * @return array<string, mixed>|list<mixed>
      */
-    public function matchProvider(string $accountNumber, bool $getLookup = false): array
+    public function matchProvider(string $accountNumber, bool $getLookup = false, ?string $operationType = null): array
     {
         return $this->transport->get('transactions/customers/match-provider/', [
             'account_number' => $accountNumber,
             'get_lookup' => $getLookup ? 'true' : null,
+            'operation_type' => $operationType,
         ]);
     }
 }

@@ -52,8 +52,13 @@ final class ProxyService
         if ($method === 'GET' && $route === 'match-provider') {
             $account = $this->stringQuery($query, 'account_number');
             $lookup = in_array((string) ($query['get_lookup'] ?? ''), ['1', 'true', 'yes'], true);
+            $operationType = $this->stringQuery($query, 'operation_type');
 
-            return $client->customers->matchProvider($account, $lookup);
+            return $client->customers->matchProvider(
+                $account,
+                $lookup,
+                $operationType !== '' ? $operationType : null,
+            );
         }
         if ($method === 'GET' && $route === 'amount-limits') {
             return $client->amountLimits->list($this->scalarQuery($query));
