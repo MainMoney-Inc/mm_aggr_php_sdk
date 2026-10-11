@@ -76,7 +76,7 @@ final class StreamHttpClient implements HttpClient
         }
 
         /** @var list<string> $responseHeaderLines */
-        $responseHeaderLines = $http_response_header ?? [];
+        $responseHeaderLines = $http_response_header ?? []; // @phpstan-ignore nullCoalesce.variable
         $statusCode = 0;
         $responseHeaders = [];
         foreach ($responseHeaderLines as $line) {

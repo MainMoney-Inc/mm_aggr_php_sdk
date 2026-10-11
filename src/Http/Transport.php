@@ -122,7 +122,7 @@ final class Transport
             $detail = $decoded['detail'] ?? $decoded['message'] ?? $raw;
             $message = is_string($detail) ? $detail : 'Aggregator request failed';
 
-            throw new ApiException($message, $status, is_array($decoded) ? $decoded : [], $decoded);
+            throw new ApiException($message, $status, $decoded, $decoded);
         }
 
         if (array_key_exists('success', $decoded)) {
