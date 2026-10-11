@@ -25,13 +25,11 @@ composer install
 
 ## Packagist
 
-The Composer name is `mainmoney/mm-aggr-php-sdk`. First publish is a one-time
-submit on [Packagist](https://packagist.org/packages/submit) pointing at
-`https://github.com/MainMoney-Inc/mm_aggr_php_sdk`. After that, enable the
-GitHub Service Hook (or Packagist GitHub App) so tags update the package.
-
-Release by pushing an annotated tag (`v0.1.0`, then semver). Do not commit
-Packagist API tokens.
+The Composer name is `mainmoney/mm-aggr-php-sdk`, registered on
+[Packagist](https://packagist.org/packages/mainmoney/mm-aggr-php-sdk) with the GitHub
+webhook enabled. Release by updating `CHANGELOG.md` and pushing an annotated tag
+`vX.Y.Z`; the `Publish` workflow runs the tests and creates the GitHub Release, and
+Packagist picks up the tag. Do not commit Packagist API tokens.
 
 ## Branches and commits
 

@@ -1,0 +1,47 @@
+name: Publish
+
+# Packagist reads git tags through its GitHub webhook (or the "Auto-update" hook
+# configured on packagist.org). This workflow checks the tag, runs the tests,
+# creates the GitHub Release and pings Packagist when a token is configured.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+      - name: Tag matches SDK version
+        run: |
+          version="$(grep -oP "VERSION = '\K[^']+" src/*.php | head -1)"
+          test -z "$version" || test "v${version}" = "${GITHUB_REF_NAME}" || { echo "Tag != SDK version v${version}"; exit 1; }
+      - name: Validate manifest
+        run: composer validate --strict --no-check-lock
+      - run: composer install --no-interaction
+      - run: vendor/bin/phpstan analyse
+      - run: vendor/bin/phpunit
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+      - name: Notify Packagist
+        if: ${{ env.PACKAGIST_TOKEN != '' }}
+        env:
+          PACKAGIST_USERNAME: mainmoney
+        run: |
+          curl -fsS -XPOST -H 'content-type: application/json' \
+            "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}" \
+            -d "{\"repository\":{\"url\":\"https://github.com/${GITHUB_REPOSITORY}\"}}"
