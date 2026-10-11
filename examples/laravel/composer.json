@@ -2,7 +2,7 @@
   "name": "mainmoney/mm-aggr-example-laravel",
   "description": "Laravel mini-shop example for the MainMoney PHP SDK",
   "type": "project",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "require": {
     "php": "^8.2",
     "laravel/framework": "^11.31",

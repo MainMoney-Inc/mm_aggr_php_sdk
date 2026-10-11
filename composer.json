@@ -2,7 +2,7 @@
   "name": "mainmoney/mm-aggr-php-sdk",
   "description": "PHP SDK for the MainMoney aggregator merchant API",
   "type": "library",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "homepage": "https://github.com/MainMoney-Inc/mm_aggr_php_sdk",
   "authors": [{ "name": "MainMoney SARL" }],
   "keywords": ["mainmoney", "payments", "merchant", "sdk"],
