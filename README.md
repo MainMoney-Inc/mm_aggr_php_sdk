@@ -1,5 +1,7 @@
 # MainMoney PHP SDK
 
+[![Packagist](https://img.shields.io/packagist/v/mainmoney/mm-aggr-php-sdk)](https://packagist.org/packages/mainmoney/mm-aggr-php-sdk) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 PHP client for the MainMoney aggregator merchant API. Install this package in
 your PHP application (Laravel, Symfony, WordPress, WooCommerce, or plain PHP).
 
@@ -16,12 +18,6 @@ Browser checkout uses the [JS/TS frontend SDK](https://github.com/MainMoney-Inc/
 
 ```bash
 composer require mainmoney/mm-aggr-php-sdk
-```
-
-Until the package is on Packagist, require the GitHub repository:
-
-```bash
-composer require mainmoney/mm-aggr-php-sdk:dev-main
 ```
 
 ## Quick start
