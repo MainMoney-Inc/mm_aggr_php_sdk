@@ -75,7 +75,7 @@ final class ProxyService
             if ($session->lockAmount && $session->amount !== null) {
                 $payload['amount'] = $session->amount;
             }
-            $result = $client->deposits->create($payload, $session->reference);
+            $result = $client->deposits->create($payload, 'mm-'.substr(hash('sha256', $session->token), 0, 32)); // one key per checkout session
             $this->markOrder($session, 'pending');
 
             return $result;
