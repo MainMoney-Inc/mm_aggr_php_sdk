@@ -5,7 +5,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.2",
-    "laravel/framework": "^11.31",
+    "laravel/framework": "^12.71",
     "mainmoney/mm-aggr-php-sdk": "dev-main"
   },
   "autoload": {
