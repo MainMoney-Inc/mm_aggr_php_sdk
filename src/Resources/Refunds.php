@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace MainMoney\Aggregator\Resources;
 
+/**
+ * `create()` accepts an optional `$merchantAccount` (a seller id) sent as
+ * `X-Merchant-Account`.
+ */
 final class Refunds extends Resource
 {
     /**
@@ -11,8 +15,15 @@ final class Refunds extends Resource
      *
      * @return array<string, mixed>|list<mixed>
      */
-    public function create(array $payload, ?string $idempotencyKey = null): array
-    {
-        return $this->transport->post('transactions/refunds/', $payload, $this->idempotencyHeaders($idempotencyKey));
+    public function create(
+        array $payload,
+        ?string $idempotencyKey = null,
+        ?string $merchantAccount = null,
+    ): array {
+        return $this->transport->post(
+            'transactions/refunds/',
+            $payload,
+            $this->idempotencyHeaders($idempotencyKey) + $this->merchantAccountHeaders($merchantAccount),
+        );
     }
 }

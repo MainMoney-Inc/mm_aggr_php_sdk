@@ -81,6 +81,17 @@ Pass `merchantAccount: $sellerId` to any method to act on behalf of a seller.
 Errors 400 (invalid) and 409 (conflict) throw `ApiException`. Full guide:
 [docs/payment-links.md](docs/payment-links.md).
 
+## More guides
+
+Per-flow guides (authentication, countries and providers, customer lookup, fees and
+pricing, deposits, payouts, remittances, refunds, status, webhooks, idempotency,
+MainMoney Rails sellers/KYB/transfers, wallets and reports, errors, browser checkout
+backend) are listed in [docs/README.md](docs/README.md).
+
+Platforms acting for sellers: `$client->sellers`, `$client->transfers`, and the
+optional `merchantAccount` argument on deposits, payouts, refunds, remittances,
+status, wallets, transactions and reports ([docs/rails.md](docs/rails.md)).
+
 Verify inbound webhooks with `$client->webhooks->verify($rawBody, $signature, $secret)`.
 
 Do not send merchant API keys to the browser.

@@ -5,7 +5,7 @@ and currency, send the returned `url` to your customer (email, chat, QR code),
 and the customer pays there with a card or mobile money. You do not need to
 build a checkout.
 
-Requirements: the API key must have the `PAYMENT_LINK` scope.
+Requirements: the API key must have the `PAYMENT_LINK` scope. The pinned contract lists only `X-Merchant-Account` as an optional header on these endpoints (no `Idempotency-Key`).
 
 ```php
 use MainMoney\Aggregator\Client;

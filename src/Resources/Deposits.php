@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace MainMoney\Aggregator\Resources;
 
+/**
+ * Mobile money / provider deposits. Both methods accept an optional
+ * `$merchantAccount` (a seller id) sent as `X-Merchant-Account`.
+ */
 final class Deposits extends Resource
 {
     /**
@@ -11,9 +15,16 @@ final class Deposits extends Resource
      *
      * @return array<string, mixed>|list<mixed>
      */
-    public function create(array $payload, ?string $idempotencyKey = null): array
-    {
-        return $this->transport->post('transactions/deposits/', $payload, $this->idempotencyHeaders($idempotencyKey));
+    public function create(
+        array $payload,
+        ?string $idempotencyKey = null,
+        ?string $merchantAccount = null,
+    ): array {
+        return $this->transport->post(
+            'transactions/deposits/',
+            $payload,
+            $this->idempotencyHeaders($idempotencyKey) + $this->merchantAccountHeaders($merchantAccount),
+        );
     }
 
     /**
@@ -21,8 +32,12 @@ final class Deposits extends Resource
      *
      * @return array<string, mixed>|list<mixed>
      */
-    public function validatePayment(array $payload = []): array
+    public function validatePayment(array $payload = [], ?string $merchantAccount = null): array
     {
-        return $this->transport->post('transactions/deposits/validate-payment/', $payload);
+        return $this->transport->post(
+            'transactions/deposits/validate-payment/',
+            $payload,
+            $this->merchantAccountHeaders($merchantAccount),
+        );
     }
 }

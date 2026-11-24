@@ -11,8 +11,8 @@ final class Wallets extends Resource
      *
      * @return array<string, mixed>|list<mixed>
      */
-    public function list(array $query = []): array
+    public function list(array $query = [], ?string $merchantAccount = null): array
     {
-        return $this->transport->get('manage/merchant-admin/wallets/', $query);
+        return $this->transport->get('manage/merchant-admin/wallets/', $query, $this->merchantAccountHeaders($merchantAccount));
     }
 }

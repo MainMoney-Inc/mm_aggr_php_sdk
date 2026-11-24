@@ -29,6 +29,27 @@ final class Transport
     }
 
     /**
+     * @param array<string, mixed> $body
+     * @param array<string, string> $headers
+     *
+     * @return array<string, mixed>|list<mixed>
+     */
+    public function patch(string $path, array $body = [], array $headers = []): array
+    {
+        return $this->request('PATCH', $path, $body, [], $headers);
+    }
+
+    /**
+     * @param array<string, string> $headers
+     *
+     * @return array<string, mixed>|list<mixed>
+     */
+    public function delete(string $path, array $headers = []): array
+    {
+        return $this->request('DELETE', $path, null, [], $headers);
+    }
+
+    /**
      * @param array<string, scalar|null> $query
      * @param array<string, string> $headers
      *

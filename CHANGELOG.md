@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.2.1
+
+- Added resources covering the rest of the pinned contract: `sellers` (create, list, get, update, countries, KYB read/edit/start/submit, onboarding link create/revoke), `transfers` (create, list, get), `pricing`, `cardDeposits->validatePayment()` and `cardPayouts->createBusinessMerchantAccount()`.
+- Optional `merchantAccount` argument (sent as `X-Merchant-Account`) on deposits (`create`, `validatePayment`), payouts (all three), refunds, remittances, `status->check()`, `wallets->list()`, `transactions->list()` and `reports`. Backward compatible: it is always the last, optional argument.
+- Transport: `patch()` and `delete()`; an empty request body is now sent as `{}` instead of `[]`.
+- Docs: one guide per flow under `docs/`, indexed in `docs/README.md`.
+
 ## 0.2.0
 
 - Added `paymentLinks` resource: `create`, `list`, `get`, `cancel` for the Payment Links API (API key scope `PAYMENT_LINK`).

@@ -43,7 +43,8 @@ final class StreamHttpClient implements HttpClient
             if (!is_array($options['json'])) {
                 throw new ApiException('JSON body must be an object', 0);
             }
-            $encoded = json_encode($options['json'], JSON_THROW_ON_ERROR);
+            // An empty body is sent as `{}`, never as the JSON list `[]`.
+            $encoded = json_encode($options['json'] === [] ? new \stdClass() : $options['json'], JSON_THROW_ON_ERROR);
             if (!is_string($encoded)) {
                 throw new ApiException('Failed to encode JSON body', 0);
             }
