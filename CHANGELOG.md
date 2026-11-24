@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.2.0
+
+- Added `paymentLinks` resource: `create`, `list`, `get`, `cancel` for the Payment Links API (API key scope `PAYMENT_LINK`).
+- Every payment link method accepts an optional `merchantAccount` to send `X-Merchant-Account` (act on behalf of a seller).
+- Docs: `docs/payment-links.md` and README section.
+
 ## 0.1.3
 
 - Security: the Laravel example requires `laravel/framework` ^12.71.

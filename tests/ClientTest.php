@@ -285,4 +285,119 @@ final class ClientTest extends TestCase
         self::assertSame('en', $prefs['locale']);
         self::assertStringContainsString('/manage/general/checkout-preferences/', $mock->history[1]['uri']);
     }
+
+    private function linkJson(string $status = 'ACTIVE'): HttpResponse
+    {
+        return new HttpResponse(200, json_encode([
+            'id' => '5b1c1d52-0000-4000-8000-000000000001',
+            'reference' => 'INV-1',
+            'amount' => '25.00',
+            'currency' => 'USD',
+            'status' => $status,
+            'url' => 'https://pay.example.test/l/abc',
+            'account_id' => null,
+        ], JSON_THROW_ON_ERROR));
+    }
+
+    public function testPaymentLinksCreate(): void
+    {
+        $mock = new MockHttpClient();
+        $client = $this->clientWithMock([$this->tokenResponse(), $this->linkJson()], $mock);
+
+        $link = $client->paymentLinks->create(
+            ['reference' => 'INV-1', 'amount' => '25.00', 'currency' => 'USD', 'single_use' => true],
+            idempotencyKey: 'sess-1',
+        );
+
+        self::assertSame('https://pay.example.test/l/abc', $link['url']);
+        $request = $mock->history[1];
+        self::assertSame('POST', $request['method']);
+        self::assertStringEndsWith('/api/v1/payment-links/', $request['uri']);
+        self::assertSame('INV-1', $request['options']['json']['reference']);
+        self::assertSame('sess-1', $request['options']['headers']['Idempotency-Key']);
+        self::assertArrayNotHasKey('X-Merchant-Account', $request['options']['headers']);
+    }
+
+    public function testPaymentLinksListPassesStatusFilter(): void
+    {
+        $mock = new MockHttpClient();
+        $client = $this->clientWithMock(
+            [
+                $this->tokenResponse(),
+                new HttpResponse(200, json_encode([
+                    'count' => 1,
+                    'next' => null,
+                    'previous' => null,
+                    'results' => [['reference' => 'INV-1', 'status' => 'ACTIVE']],
+                ], JSON_THROW_ON_ERROR)),
+            ],
+            $mock,
+        );
+
+        $page = $client->paymentLinks->list(['status' => 'ACTIVE']);
+
+        self::assertSame(1, $page['count']);
+        self::assertSame('GET', $mock->history[1]['method']);
+        self::assertStringEndsWith('/api/v1/payment-links/', $mock->history[1]['uri']);
+        self::assertSame(['status' => 'ACTIVE'], $mock->history[1]['options']['query']);
+    }
+
+    public function testPaymentLinksGetAndCancel(): void
+    {
+        $mock = new MockHttpClient();
+        $client = $this->clientWithMock(
+            [$this->tokenResponse(), $this->linkJson(), $this->linkJson('CANCELLED')],
+            $mock,
+        );
+
+        $id = '5b1c1d52-0000-4000-8000-000000000001';
+        self::assertSame('ACTIVE', $client->paymentLinks->get($id)['status']);
+        self::assertSame('CANCELLED', $client->paymentLinks->cancel($id)['status']);
+
+        self::assertSame('GET', $mock->history[1]['method']);
+        self::assertStringEndsWith('/api/v1/payment-links/'.$id.'/', $mock->history[1]['uri']);
+        self::assertSame('POST', $mock->history[2]['method']);
+        self::assertStringEndsWith('/api/v1/payment-links/'.$id.'/cancel/', $mock->history[2]['uri']);
+    }
+
+    public function testPaymentLinksSendMerchantAccountHeaderOnBehalfOfSeller(): void
+    {
+        $mock = new MockHttpClient();
+        $client = $this->clientWithMock(
+            [$this->tokenResponse(), $this->linkJson(), $this->linkJson(), $this->linkJson('CANCELLED')],
+            $mock,
+        );
+        $seller = '0d9a6a0e-0000-4000-8000-0000000000aa';
+
+        $client->paymentLinks->create(
+            ['reference' => 'INV-1', 'amount' => '25.00', 'currency' => 'USD'],
+            merchantAccount: $seller,
+        );
+        $client->paymentLinks->get('abc', merchantAccount: $seller);
+        $client->paymentLinks->cancel('abc', merchantAccount: $seller);
+
+        foreach ([1, 2, 3] as $i) {
+            self::assertSame($seller, $mock->history[$i]['options']['headers']['X-Merchant-Account']);
+        }
+    }
+
+    public function testPaymentLinksConflictSurfacesAsApiException(): void
+    {
+        $mock = new MockHttpClient();
+        $client = $this->clientWithMock(
+            [
+                $this->tokenResponse(),
+                new HttpResponse(409, json_encode(['detail' => 'Link already paid'], JSON_THROW_ON_ERROR)),
+            ],
+            $mock,
+        );
+
+        try {
+            $client->paymentLinks->cancel('abc');
+            self::fail('Expected ApiException');
+        } catch (ApiException $exception) {
+            self::assertSame('Link already paid', $exception->getMessage());
+            self::assertSame(409, $exception->getStatusCode());
+        }
+    }
 }

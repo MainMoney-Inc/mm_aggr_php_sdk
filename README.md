@@ -56,6 +56,31 @@ failed deposit also use a new `reference`, because a failed one stays reserved.
 Derive the key from your checkout session, not from the cart or order. Amounts are
 decimal strings; do not mix currencies.
 
+## Payment links
+
+Create a hosted payment page and send the returned `url` to your customer
+(API key scope `PAYMENT_LINK`):
+
+```php
+$link = $client->paymentLinks->create([
+    'reference' => 'INV-1042',
+    'amount' => '25.00',
+    'currency' => 'USD',
+    'expires_at' => '2026-12-31T23:59:59Z', // optional
+    'single_use' => true,                    // optional, default true
+    'redirect_url' => 'https://shop.example/thanks', // optional
+], idempotencyKey: 'invoice-1042-link');
+
+$link['url'];                                  // customer pays here
+$client->paymentLinks->list(['status' => 'ACTIVE']);
+$client->paymentLinks->get($link['id']);
+$client->paymentLinks->cancel($link['id']);    // ACTIVE links only
+```
+
+Pass `merchantAccount: $sellerId` to any method to act on behalf of a seller.
+Errors 400 (invalid) and 409 (conflict) throw `ApiException`. Full guide:
+[docs/payment-links.md](docs/payment-links.md).
+
 Verify inbound webhooks with `$client->webhooks->verify($rawBody, $signature, $secret)`.
 
 Do not send merchant API keys to the browser.
